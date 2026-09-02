@@ -23,6 +23,7 @@ if [ "$1" = "-d" ]; then
 
         rm -rf "$carpeta_base/EPNro1"
         echo "Entorno borrado con exito."
+        printf "\n"
     exit 0 
 fi 
 
@@ -55,10 +56,10 @@ case $opcion in
 
 carpeta_base="\$(dirname "\$(realpath "\$0")")" 
 
-carpeta_origen="\$carpeta_base/EPNro1/entrada"
-carpeta_destino="\$carpeta_base/EPNro1/salida/FILENAME.txt"
-carpeta_intermedia="\$carpeta_base/EPNro1/procesado"
-archivo_log="\$carpeta_base/EPNro1/procesado.log"
+carpeta_origen="\$carpeta_base/entrada"
+carpeta_destino="\$carpeta_base/salida/FILENAME.txt"
+carpeta_intermedia="\$carpeta_base/procesado"
+archivo_log="\$carpeta_base/procesado.log"
 
 while :
 do
@@ -66,14 +67,17 @@ do
         then
                 for archivo in "\$carpeta_origen"/*.txt 
                 do
-                        [ -e "\$archivo" ] #-e comprueba si el archivo existe, si no existe continua con el siguiente archivo
+                        [ -e "\$archivo" ] || continue  #-e comprueba si el archivo existe, si no existe continua con el siguiente archivo
+                        
                         nom=\$(basename "\$archivo")
                         fecha_hora=\$(date +'%d/%m/%Y %H:%M:%S')
                         echo "\$fecha_hora - Procesado archivo \$nom" >> "\$archivo_log"
 
-                        cat "\$archivo" >> "\$carpeta_destino"
-                        mv "\$archivo" "\$carpeta_intermedia"
-                done
+                        if [ -s "\$archivo" ]; then #-s comprueba si el archivo no esta vacio
+                                cat "\$archivo" >> "\$carpeta_destino"
+                                mv "\$archivo" "\$carpeta_intermedia"       
+                        fi
+                done    
         else
                 echo -e "\nno existe filename\n"
         fi
